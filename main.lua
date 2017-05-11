@@ -149,8 +149,8 @@ function love.update(dt)
 		end
 
 		if love.keyboard.isDown('up') then
-			if player1.y_velocity == 0 then
-				player1.y_velocity = player1.jump_height
+			if player1.y > 0 then
+				player1.y_velocity = player1.y_velocity - 1
 			end
 		end
 
@@ -162,6 +162,11 @@ function love.update(dt)
 		if player1.y > player1.ground then
 			player1.y_velocity = 0
    		 	player1.y = player1.ground
+		end
+
+		if player1.y < 0 then
+   		 	player1.y = 0
+			player1.y_velocity = 1
 		end
 
 		if love.keyboard.isDown('space') then
@@ -188,8 +193,8 @@ function love.update(dt)
 		end
 
 		if love.keyboard.isDown('w') then
-			if player2.y_velocity == 0 then
-				player2.y_velocity = player2.jump_height
+			if player2.y > 0 then
+				player2.y_velocity = player2.y_velocity - 1
 			end
 		end
 
@@ -201,6 +206,11 @@ function love.update(dt)
 		if player2.y > player2.ground then
 			player2.y_velocity = 0
    		 	player2.y = player2.ground
+		end
+
+		if player2.y < 0 then
+   		 	player2.y = 0
+			player2.y_velocity = 1
 		end
 
 		if love.keyboard.isDown('lshift') then
@@ -264,7 +274,7 @@ function drawMap()
 	for x = 0, 20 do
 		for y = 0, 12 do
 			sprites.drawTile(
-				sprites.tiles[m.data[(y-1) * 20 + x]],
+				sprites.tiles[m.data[(y - 1) * 20 + x]],
 				(16 * config.scale) * (x - 1),
 				(16 * config.scale) * (y - 1) + (8 * config.scale)
 			)
@@ -279,9 +289,8 @@ function initPlayers()
 	player1.speed = 200
 	player1.img = sprites.tiles[2]
 	player1.ground = love.graphics.getHeight() - 16 * config.scale
-	player1.jump_height = -300
-	player1.y_velocity = player1.jump_height
-	player1.gravity = -500
+	player1.y_velocity = -1
+	player1.gravity = -200
 	player1.direction = 'right'
 	player1.fuel = 255
 	player1.score = 0
@@ -293,8 +302,8 @@ function initPlayers()
 	player2.img = sprites.tiles[7]
 	player2.ground = love.graphics.getHeight() - 16 * config.scale
 	player2.jump_height = -300
-	player2.y_velocity = player2.jump_height
-	player2.gravity = -500
+	player2.y_velocity = -1
+	player2.gravity = -200
 	player2.direction = 'left'
 	player2.fuel = 255
 	player2.score = 0
