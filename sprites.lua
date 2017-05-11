@@ -9,7 +9,9 @@ sprites.scale = 2
 
 -- draw a tile n at position x, y (absolute)
 function sprites.drawTile(n, x, y)
-	love.graphics.draw(sprites.tilesImage, n, x, y, 0, config.scale, config.scale, 0, 0)
+	if (n ~= nil) then
+		love.graphics.draw(sprites.tilesImage, n, x, y, 0, config.scale, config.scale, 0, 0)
+	end
 end
 
 -- load tile images
@@ -19,7 +21,7 @@ function sprites.loadTiles()
 
 	-- load tiles
 	for i = 1, sprites.maxTile do
-		sprites.tiles[i] = love.graphics.newQuad(0,16*i-1,16,16,sprites.tilesImage:getDimensions())
+		sprites.tiles[i] = love.graphics.newQuad(0,16*i,16,16,sprites.tilesImage:getDimensions())
 	end
 end
 
