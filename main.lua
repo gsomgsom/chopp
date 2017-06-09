@@ -20,6 +20,42 @@ local map = {
 	data = {}
 }
 
+-- return char as utf8 string
+local function CodeToUTF8 (Unicode)
+  if (Unicode == nil) then 
+    return ""
+  end
+
+  if (Unicode < 0x20) then return ' '; end;
+
+    if (Unicode <= 0x7F) then return string.char(Unicode); end;
+
+    if (Unicode <= 0x7FF) then
+      local Byte0 = 0xC0 + math.floor(Unicode / 0x40);
+      local Byte1 = 0x80 + (Unicode % 0x40);
+      return string.char(Byte0, Byte1);
+    end;
+
+    if (Unicode <= 0xFFFF) then
+      local Byte0 = 0xE0 +  math.floor(Unicode / 0x1000);
+      local Byte1 = 0x80 + (math.floor(Unicode / 0x40) % 0x40);
+      local Byte2 = 0x80 + (Unicode % 0x40);
+      return string.char(Byte0, Byte1, Byte2);
+    end;
+
+    return "";    -- ignore UTF-32 for the moment
+end;
+
+
+-- convert ascii string to utf8 string
+function AsciiToUTF8(str)
+  result = ""
+  for i = 1, #str do
+    result = result .. CodeToUTF8(string.byte(str, i, i+1))
+  end
+  return result
+end
+
 -- init
 function love.load()
 	sprites.loadTiles()
@@ -39,11 +75,12 @@ function love.load()
 	love.audio.setVolume(0.5) -- @todo settings
 	love.audio.play(musicIntro)
 
-	-- font @todo make original font
-	font = love.graphics.newImageFont("images/font.png",
-		" abcdefghijklmnopqrstuvwxyz" ..
-		"ABCDEFGHIJKLMNOPQRSTUVWXYZ0" ..
-		"123456789.,!?-+/():;%&`'*#=[]\"")
+	-- font
+	local charset = ''
+	for x = 0, 255 do
+		charset = charset..string.char(x);
+	end
+	font = love.graphics.newImageFont("images/font.png", AsciiToUTF8(charset))
 	love.graphics.setFont(font)
 
 end
