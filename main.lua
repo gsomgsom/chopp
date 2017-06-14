@@ -21,39 +21,39 @@ local map = {
 }
 
 -- return char as utf8 string
-local function CodeToUTF8 (Unicode)
-  if (Unicode == nil) then 
-    return ""
-  end
+local function CodeToUTF8(Unicode)
+	if (Unicode == nil) then 
+		return ""
+	end
 
-  if (Unicode < 0x20) then return ' '; end;
+	if (Unicode < 0x20) then return ' '; end;
 
-    if (Unicode <= 0x7F) then return string.char(Unicode); end;
+		if (Unicode <= 0x7F) then return string.char(Unicode); end;
 
-    if (Unicode <= 0x7FF) then
-      local Byte0 = 0xC0 + math.floor(Unicode / 0x40);
-      local Byte1 = 0x80 + (Unicode % 0x40);
-      return string.char(Byte0, Byte1);
-    end;
+		if (Unicode <= 0x7FF) then
+			local Byte0 = 0xC0 + math.floor(Unicode / 0x40);
+			local Byte1 = 0x80 + (Unicode % 0x40);
+			return string.char(Byte0, Byte1);
+		end;
 
-    if (Unicode <= 0xFFFF) then
-      local Byte0 = 0xE0 +  math.floor(Unicode / 0x1000);
-      local Byte1 = 0x80 + (math.floor(Unicode / 0x40) % 0x40);
-      local Byte2 = 0x80 + (Unicode % 0x40);
-      return string.char(Byte0, Byte1, Byte2);
-    end;
+		if (Unicode <= 0xFFFF) then
+			local Byte0 = 0xE0 + math.floor(Unicode / 0x1000);
+			local Byte1 = 0x80 + (math.floor(Unicode / 0x40) % 0x40);
+			local Byte2 = 0x80 + (Unicode % 0x40);
+			return string.char(Byte0, Byte1, Byte2);
+		end;
 
-    return "";    -- ignore UTF-32 for the moment
+		return "";		-- ignore UTF-32 for the moment
 end;
 
 
 -- convert ascii string to utf8 string
 function AsciiToUTF8(str)
-  result = ""
-  for i = 1, #str do
-    result = result .. CodeToUTF8(string.byte(str, i, i+1))
-  end
-  return result
+	result = ""
+	for i = 1, #str do
+		result = result .. CodeToUTF8(string.byte(str, i, i+1))
+	end
+	return result
 end
 
 -- init
@@ -82,7 +82,6 @@ function love.load()
 	end
 	font = love.graphics.newImageFont("images/font.png", AsciiToUTF8(charset))
 	love.graphics.setFont(font)
-
 end
 
 -- keyboard events
@@ -90,7 +89,6 @@ function love.keypressed(key, unicode)
 
 	-- title
 	if (gameState == 'title') then
-
 		if (love.keyboard.isDown('escape')) then
 			print("Bye!")
 			love.event.push('quit')
@@ -100,21 +98,26 @@ function love.keypressed(key, unicode)
 			love.audio.stop()
 			love.audio.play(musicIngame)
 			gameState = 'ingame'
-			map = love.filesystem.load('maps/level_1.lua')
+			map = love.filesystem.load('maps/level_'..level..'.lua')
 			initPlayers()
 		end
 
+		if (love.keyboard.isDown('f2')) then
+			if (level < 50) then
+				level = level + 1
+			else
+				level = 1
+			end
+		end
 	end
 
 	-- ingame
 	if (gameState == 'ingame') then
-
 		if (love.keyboard.isDown('escape')) then
 			love.audio.stop()
 			love.audio.play(musicIntro)
 			gameState = 'title'
 		end
-
 	end
 
 end
@@ -187,7 +190,13 @@ function love.update(dt)
 
 		if love.keyboard.isDown('up') then
 			if player1.y > 0 then
-				player1.y_velocity = player1.y_velocity - 1
+				player1.y_velocity = player1.y_velocity - 10
+			end
+		end
+
+		if love.keyboard.isDown('down') then
+			if player1.y > 0 then
+				player1.y_velocity = player1.y_velocity + 10
 			end
 		end
 
@@ -198,11 +207,11 @@ function love.update(dt)
 
 		if player1.y > player1.ground then
 			player1.y_velocity = 0
-   		 	player1.y = player1.ground
+	 		 	player1.y = player1.ground
 		end
 
 		if player1.y < 0 then
-   		 	player1.y = 0
+	 		 	player1.y = 0
 			player1.y_velocity = 1
 		end
 
@@ -231,7 +240,13 @@ function love.update(dt)
 
 		if love.keyboard.isDown('w') then
 			if player2.y > 0 then
-				player2.y_velocity = player2.y_velocity - 1
+				player2.y_velocity = player2.y_velocity - 10
+			end
+		end
+
+		if love.keyboard.isDown('s') then
+			if player2.y > 0 then
+				player2.y_velocity = player2.y_velocity + 10
 			end
 		end
 
@@ -242,11 +257,11 @@ function love.update(dt)
 
 		if player2.y > player2.ground then
 			player2.y_velocity = 0
-   		 	player2.y = player2.ground
+		 	player2.y = player2.ground
 		end
 
 		if player2.y < 0 then
-   		 	player2.y = 0
+		 	player2.y = 0
 			player2.y_velocity = 1
 		end
 
@@ -267,7 +282,8 @@ function love.draw()
 		love.graphics.print('Chopper Duel ver. '..config.version, 0, 0)
 
 		love.graphics.print('F1 - NEW GAME', 250, 250)
-		love.graphics.print('ESC - QUIT', 250, 270)
+		love.graphics.print('F2 - LEVEL '..level, 250, 270)
+		love.graphics.print('ESC - QUIT', 250, 290)
 
 		-- player 2 (red)
 		sprites.drawTile(
@@ -324,7 +340,7 @@ function initPlayers()
 	player1.x = 0
 	player1.y = 16 * config.scale
 	player1.speed = 200
-	player1.img = sprites.tiles[2]
+	player1.img = sprites.tiles[14]
 	player1.ground = love.graphics.getHeight() - 16 * config.scale
 	player1.y_velocity = -1
 	player1.gravity = -200
